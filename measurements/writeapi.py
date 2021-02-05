@@ -29,7 +29,7 @@ def write_csv(request):
     data = request.body.decode().strip()
     df = pd.read_csv(io.StringIO(data),
                      index_col=None,
-                     sep=',', header=1,
+                     sep=',', header=0,
                      dtype={'station': object})
     df['timestamp'] = pd.to_datetime(df.timestamp)
     if df.timestamp.dt.tz is None:
@@ -47,11 +47,12 @@ def write_csv(request):
     dfm = df.merge(sdf,
                    left_on=['parameter', 'station', 'sensor'],
                    right_on=['parameter', 'station', 'sensor'])
-    cnames = ['serie_id', 'timestamp']
+    cnames = ['serie_id', 'timestamp', 'value']
     _df = dfm[cnames].copy()
+
     for chunk in np.array_split(_df, _df.shape[0] // 1000 + 1):
         datadict = chunk.to_dict(orient='record')
-        Measure.extra.on_conflict(cnames,
+        Measure.extra.on_conflict(['serie_id', 'timestamp'],
                                   ConflictAction.UPDATE).bulk_insert(datadict)
     return JsonResponse({"success": True})
 
@@ -73,6 +74,10 @@ def write_data(body):
     for l in body.decode().strip().split("\n"):
         datadict.append(parse_line(l))
     # stats = _write(data)
+    # remove duplicates to avoid conflict on UPSERT
+    df = pd.DataFrame(datadict)
+    datadict = df.drop_duplicates(subset=['timestamp', 'serie_id'], keep='last').to_dict(orient='records')
+
     Measure.extra.on_conflict(['timestamp', 'serie_id'],
                               ConflictAction.UPDATE).bulk_insert(datadict)
     stats = {'updated': -1,
