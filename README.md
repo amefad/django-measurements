@@ -1,5 +1,5 @@
 # django-measurements
-Django application for integrating measurements time series
+Django application for aggregating measurements time series
 
 ## Installation
 ```
