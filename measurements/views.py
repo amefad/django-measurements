@@ -12,7 +12,6 @@ def locations_flatjson(request):
     return JsonResponse(Location.objects.get_flatjson(), safe=False)
 
 
-
 def measure_geojson(request):
     metric = request.GET.get('metric', None)
     if metric is None:
@@ -38,20 +37,24 @@ def get_geojsonpg(metric):
     qs = qs.filter(timestamp__gte=start_time, timestamp__lte=end_time)
 
     if aggregate == 'last':
-        results = qs.order_by('serie__station', '-timestamp').distinct('serie__station').values('serie__station', 'value')
+        results = qs.order_by('serie__station', 'serie__location', '-timestamp').distinct('serie__station', 'serie__location').values('serie__station', 'serie__location', 'value')
     else:
-        results = qs.values('serie__station').annotate(value=AggregateMode(
+        results = qs.values('serie__station', 'serie__location').annotate(value=AggregateMode(
             'value'))  # .order_by('parameter', 'location', '-datetime').distinct('parameter', 'location')
 
     items = []
 
     for r in results:
-        s = Station.objects.get(pk=r['serie__station'])
-        if s.location is None:
+        if r['serie__location'] is None:
             continue
-        geometry = loads(s.location.geo.geojson)
+        s = Station.objects.get(pk=r['serie__station'])
+        l = Location.objects.get(pk=r['serie__location'])
+        if l.geo is None:
+            continue
+        geometry = loads(l.geo.geojson)
         properties = {'value': r['value'],
-                      'location': s.label}
+                      'location': l.label,
+                      'station': l.label}
         items.append(Feature(geometry=geometry.copy(), properties=properties))
 
     fc = FeatureCollection(items)
