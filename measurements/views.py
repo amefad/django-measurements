@@ -5,6 +5,7 @@ from .utils import get_time, classify_fc
 from django.apps import apps
 from geojson import Feature, FeatureCollection, loads
 from .models import Parameter, Serie, Measure, Station
+from django.http import Http404
 
 
 def locations_flatjson(request):
