@@ -96,7 +96,7 @@ class Serie(models.Model):
     sensor = models.ForeignKey(Sensor, on_delete=models.CASCADE)
     parameter = models.ForeignKey(Parameter, on_delete=models.CASCADE)
     height = models.FloatField(blank=True, null=True)
-
+    location = models.ForeignKey(Location, on_delete=models.CASCADE, null=True, blank=True)
     # add below additional fields
     stats_mean = models.FloatField(blank=True, null=True)
     stats_outliers = ArrayField(models.IntegerField(), blank=True, null=True)
