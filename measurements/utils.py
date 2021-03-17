@@ -3,24 +3,30 @@ import pandas as pd
 import numpy as np
 
 from psqlextra.query import ConflictAction
-from measurements.models import Measure, Station, Parameter, Sensor, Serie
+from measurements.models import Measure, Station, Parameter, Sensor, Serie, Location
 import colorbrewer
 from numpy import array
 
 
-
-def get_serie(station, parameter, sensor='unknown', height=None):
+def get_serie(station, parameter, sensor='unknown', height=None, location=None):
     if not isinstance(station, Station):
         station, created = Station.objects.get_or_create(code=station)
     if not isinstance(parameter, Parameter):
         parameter, created = Parameter.objects.get_or_create(code=parameter)
     if not isinstance(sensor, Sensor):
         sensor, created = Sensor.objects.get_or_create(code=sensor)
+    # try to use Station.location when location is not specified
+    if location is None:
+        location = station.location
+    else:
+        if not isinstance(location, Location):
+            location, created = Location.objects.get_or_create(label=location)
 
     serie, created = Serie.objects.get_or_create(station=station,
                                                  parameter=parameter,
                                                  sensor=sensor,
-                                                 height=height)
+                                                 height=height,
+                                                 location=location)
     return serie
 
 

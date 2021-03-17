@@ -76,8 +76,10 @@ class Station(models.Model):
     code = models.CharField(max_length=100)
     label = models.CharField(max_length=150, null=True, blank=True)
     network = models.ForeignKey(Network, on_delete=models.CASCADE, null=True, blank=True)
+    # location has been moved directly within Series model
+    # this location field should provide current Station location
     location = models.ForeignKey(Location, on_delete=models.CASCADE, null=True, blank=True)
-    #TODO: not sure if source should be in Station or Serie
+    #TODO: not sure if source should be in Station or Series
     source = models.ForeignKey(SourceType, on_delete=models.CASCADE, null=True, blank=True)
     status = models.CharField(max_length=255,
                               choices=[(i, i) for i in ['active', 'decomissioned', 'in maintenance']], default='active')
