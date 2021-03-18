@@ -4,7 +4,7 @@ from django.db import migrations, models
 import django.db.models.deletion
 
 sql_create_view = """
-create view measurements_grafana_view as
+create or replace view measurements_grafana_view as
  SELECT mm."timestamp",
     mm.value,
     ml.label AS location,
@@ -15,7 +15,8 @@ create view measurements_grafana_view as
     st_y(ml.geo) AS latitude,
     mp.code AS parameter,
     mp.id AS parameter_id,
-    ms.height
+    ms.height,
+    ms.id AS serie_id
    FROM measurements_measure mm
      LEFT JOIN measurements_serie ms ON mm.serie_id = ms.id
      LEFT JOIN measurements_station mst ON ms.station_id = mst.id
