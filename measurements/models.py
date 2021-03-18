@@ -100,9 +100,9 @@ class Station(models.Model):
 
 
 class ParameterMapping(models.Model):
-    parameter = models.ForeignKey(Parameter, on_delete=models.CASCADE)
     data_source = models.ForeignKey(Station, on_delete=models.CASCADE)
     source_parameter_label = models.CharField(max_length=64)
+    parameter = models.ForeignKey(Parameter, on_delete=models.CASCADE)
 
 
 class Serie(models.Model):
