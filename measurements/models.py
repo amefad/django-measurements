@@ -79,10 +79,11 @@ class Station(models.Model):
     # location has been moved directly within Series model
     # this location field should provide current Station location
     location = models.ForeignKey(Location, on_delete=models.CASCADE, null=True, blank=True)
-    #TODO: not sure if source should be in Station or Series
     source = models.ForeignKey(SourceType, on_delete=models.CASCADE, null=True, blank=True)
     status = models.CharField(max_length=255,
                               choices=[(i, i) for i in ['active', 'decomissioned', 'in maintenance']], default='active')
+    # this allows to override SourceType endpoint
+    uri = models.URLField(blank=True, null=True, help_text="DataSource/Station endpoint")
 
     objects = models.Manager()
     extra = PostgresManager()
@@ -91,6 +92,10 @@ class Station(models.Model):
         l = getattr(self, 'label') or getattr(self, 'code')
         n = getattr(self, 'network', '')
         return u'{} {}'.format(l, n)
+
+    class Meta:
+        verbose_name = "DataSource/Station"
+        verbose_name_plural = "DataSources/Stations"
 
 
 class Serie(models.Model):
