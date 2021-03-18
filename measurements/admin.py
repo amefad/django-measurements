@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.contrib import admin
-from .models import Parameter, Sensor, Location, Serie, Measure, Network, SourceType, Station
+from .models import Parameter, Sensor, Location, Serie, Measure, Network, SourceType, Station, ParameterMapping
 
 load_google = False
 try:
@@ -35,7 +35,12 @@ class SerieAdmin(admin.ModelAdmin):
     list_filter = ('station', 'sensor', 'parameter')
 
 
+class ParameterMappingInline(admin.TabularInline):
+    model = ParameterMapping
+
+
 class StationAdmin(admin.ModelAdmin):
+    inlines = [ParameterMappingInline]
     pass
 
 

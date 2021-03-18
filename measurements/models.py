@@ -82,6 +82,7 @@ class Station(models.Model):
     source = models.ForeignKey(SourceType, on_delete=models.CASCADE, null=True, blank=True)
     status = models.CharField(max_length=255,
                               choices=[(i, i) for i in ['active', 'decomissioned', 'in maintenance']], default='active')
+    parameters_mapping = models.ManyToManyField(Parameter, through='ParameterMapping')
     # this allows to override SourceType endpoint
     uri = models.URLField(blank=True, null=True, help_text="DataSource/Station endpoint")
 
@@ -96,6 +97,12 @@ class Station(models.Model):
     class Meta:
         verbose_name = "DataSource/Station"
         verbose_name_plural = "DataSources/Stations"
+
+
+class ParameterMapping(models.Model):
+    parameter = models.ForeignKey(Parameter, on_delete=models.CASCADE)
+    data_source = models.ForeignKey(Station, on_delete=models.CASCADE)
+    source_parameter_label = models.CharField(max_length=64)
 
 
 class Serie(models.Model):
