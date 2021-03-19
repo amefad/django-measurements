@@ -1,23 +1,41 @@
 # import pandas as pd
 from django.contrib.gis.db import models
+from django.core.exceptions import ValidationError
 from django.contrib.postgres.fields import ArrayField
 from django.utils.text import slugify
 from django_pandas.io import read_frame
 from psqlextra.manager import PostgresManager
-
+from measurements import ureg, Q_
+from pint.errors import UndefinedUnitError
 import numpy as np
+
+def validate_uom(value):
+    if value is None:
+        return value
+    try:
+        return ureg.get_name(value)
+    except UndefinedUnitError:
+        pass
+    raise ValidationError("The provided unit of measure ({}) is not identifiable. Please provide a valid name.".format(value))
 
 
 class Parameter(models.Model):
-    code = models.CharField(max_length=100, blank=True, null=True)
-    uri = models.URLField(blank=True, null=True)
-    label = models.CharField(max_length=150)
+    code = models.CharField(max_length=100)
+    uri = models.URLField(blank=True, null=True, help_text="Reference to a controlled vocabulary (eg. NERC)")
+    label = models.CharField(max_length=150, blank=True, null=True)
+    uom = models.CharField(max_length=25,
+                           validators=[validate_uom],
+                           help_text="unit of measure based on python-pint unit registry (eg. meter, kelvin)",
+                           blank=True, null=True)
 
     objects = models.Manager()
     extra = PostgresManager()
 
     def __str__(self):
-        return u'{}'.format(self.code)
+        if self.uom is None:
+            return u'{}'.format(self.code)
+        else:
+            return u'{} ({})'.format(self.code, self.uom)
 
 
 class Sensor(models.Model):
@@ -103,6 +121,10 @@ class ParameterMapping(models.Model):
     data_source = models.ForeignKey(Station, on_delete=models.CASCADE)
     source_parameter_label = models.CharField(max_length=64,
                                               help_text="Parameter label or layer name published by the data provider")
+    source_parameter_uom = models.CharField(max_length=25,
+                                            validators=[validate_uom],
+                                            help_text="unit of measure based on python-pint unit registry (eg. meter, kelvin)",
+                                            blank=True, null=True)
     parameter = models.ForeignKey(Parameter, on_delete=models.CASCADE)
 
 

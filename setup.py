@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='django-measurements',
-    version='0.22',
+    version='0.23',
     # packages=['measurements'],
     packages=find_packages(),
     url='',
@@ -12,5 +12,6 @@ setup(
     description='', install_requires=['requests', 'pycryptodome',
                                       'django-postgres-extra', 'django_pandas',
                                       'geojson', 'colorbrewer',
-                                      'django-basicauth']
+                                      'django-basicauth', 'lxml', 'beautifulsoup4',
+                                      'pint',]
 )

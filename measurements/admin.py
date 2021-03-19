@@ -1,5 +1,6 @@
 from django.conf import settings
-from django.contrib import admin
+# from django.contrib import admin
+from django.contrib.gis import admin
 from .models import Parameter, Sensor, Location, Serie, Measure, Network, SourceType, Station, ParameterMapping
 
 load_google = False
