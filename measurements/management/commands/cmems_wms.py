@@ -49,7 +49,7 @@ class Command(BaseCommand):
                     df = apiclient.get_df(layer, point, timedelta=days, timegap=daysgap)
                     # convert uom if needed
                     if uom is not None and source_uom is not None and uom != source_uom:
-                        df['value'] = Q_(df.value.array, source_uom).to(source_uom).magnitude
+                        df['value'] = Q_(df.value.array, source_uom).to(uom).magnitude
                     if df.shape[0] > 0:
                         load_serie(df['value'].copy(), series.id)
                         self.stdout.write("nrecords {}".format(df.shape[0]), ending='')

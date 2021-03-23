@@ -13,7 +13,7 @@ def validate_uom(value):
     if value is None:
         return value
     try:
-        return ureg.get_name(value)
+        return ureg(value).units
     except UndefinedUnitError:
         pass
     raise ValidationError("The provided unit of measure ({}) is not identifiable. Please provide a valid name.".format(value))
@@ -80,7 +80,10 @@ class Network(models.Model):
     label = models.CharField(max_length=150, blank=True, null=True)
 
     def __str__(self):
-        return u'{}'.format(self.label)
+        if self.label is not None:
+            return u'{}'.format(self.label)
+        else:
+            return u'{}'.format(self.code)
 
 
 class SourceType(models.Model):
@@ -93,6 +96,7 @@ class SourceType(models.Model):
 class Station(models.Model):
     code = models.CharField(max_length=100)
     label = models.CharField(max_length=150, null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
     network = models.ForeignKey(Network, on_delete=models.CASCADE, null=True, blank=True)
     # location has been moved directly within Series model
     # this location field should provide current Station location
