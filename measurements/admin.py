@@ -32,7 +32,7 @@ class NetworkAdmin(admin.ModelAdmin):
 
 
 class SerieAdmin(admin.ModelAdmin):
-    list_display = ('station', 'sensor', 'parameter', 'height')
+    list_display = ('station', 'location', 'sensor', 'parameter', 'height')
     list_filter = ('station', 'sensor', 'parameter')
 
 
