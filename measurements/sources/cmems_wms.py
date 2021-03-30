@@ -36,7 +36,11 @@ def get_timeindex(timepositions):
         # positions.appen
         # print(t)
         else:
-            _dr = pd.date_range(t, periods=1, freq='1D')
+            try:
+                _dr = pd.date_range(t, periods=1, freq='1D')
+            except ValueError as err:
+                logger.warning("Skip invalid time position: {0}".format(err))
+                continue
         if dr is None:
             dr = _dr
         else:
@@ -50,6 +54,12 @@ def align_time(time, time_index, tolerance='30d'):
                             tolerance=tolerance)
     return time_index[id]
 
+# TODO: create view  SELECT DISTINCT l.label AS __text,
+#     l.id AS __value
+#    FROM measurements_station s
+#      LEFT JOIN measurements_location l ON s.location_id = l.id
+#   WHERE s.status::text = 'active'::text
+#   ORDER BY l.label;
 
 class CMEMSWmsDataSource(BaseSource):
     def __init__(self, url, version='1.3.0'):
