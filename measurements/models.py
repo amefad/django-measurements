@@ -98,6 +98,7 @@ class Station(models.Model):
     code = models.CharField(max_length=100)
     label = models.CharField(max_length=150, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
+    image = models.ImageField(null=True, blank=True)
     network = models.ForeignKey(Network, on_delete=models.CASCADE, null=True, blank=True)
     # location has been moved directly within Series model
     # this location field should provide current Station location
